@@ -1,0 +1,498 @@
+connection = sqlite3.connect("C:\\Users\\Norma\\OneDrive\\Documents\\ch17\\books.db")
+
+import pandas as pd
+
+pd.options.display.max_columns = 10
+
+pd.read_sql("""SELECT last
+            FROM authors
+            ORDER BY last DESC""",
+            connection, index_col=['id'])
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+<ipython-input-6-7366f71e4f8c> in <module>
+----> 1 pd.read_sql("""SELECT last
+      2             FROM authors
+      3             ORDER BY last DESC""",
+      4             connection, index_col=['id'])
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_sql(sql, con, index_col, coerce_float, params, parse_dates, columns, chunksize)
+    493 
+    494     if isinstance(pandas_sql, SQLiteDatabase):
+--> 495         return pandas_sql.read_query(
+    496             sql,
+    497             index_col=index_col,
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_query(self, sql, index_col, coerce_float, params, parse_dates, chunksize)
+   1785             cursor.close()
+   1786 
+-> 1787             frame = _wrap_result(
+   1788                 data,
+   1789                 columns,
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in _wrap_result(data, columns, index_col, coerce_float, parse_dates)
+    138 
+    139     if index_col is not None:
+--> 140         frame.set_index(index_col, inplace=True)
+    141 
+    142     return frame
+
+~\anaconda3\lib\site-packages\pandas\core\frame.py in set_index(self, keys, drop, append, inplace, verify_integrity)
+   4725 
+   4726         if missing:
+-> 4727             raise KeyError(f"None of {missing} are in the columns")
+   4728 
+   4729         if inplace:
+
+KeyError: "None of ['id'] are in the columns"
+
+pd.read_sql("""SELECT id, first, last
+            FROM authors
+            ORDER BY last DESC""",
+            connection, index_col=['id'])
+Out[7]: 
+        first    last
+id                   
+5   Alexander    Wald
+4         Dan   Quirk
+1        Paul  Deitel
+2      Harvey  Deitel
+3       Abbey  Deitel
+
+pd.read_sql("""SELECT title
+            FROM titles
+            ORDER BY title""",
+            connection)
+Out[8]: 
+                              title
+0         Android 6 for Programmers
+1            Android How to Program
+2                  C How to Program
+3                C++ How to Program
+4     Internet & WWW How to Program
+5     Intro to Python for CS and DS
+6               Java How to Program
+7  Visual Basic 2012 How to Program
+8          Visual C# How to Program
+9         Visual C++ How to Program
+
+pd.read_sql("""SELECT title
+            FROM titles
+            ORDER BY title ASC""",
+            connection)
+Out[9]: 
+                              title
+0         Android 6 for Programmers
+1            Android How to Program
+2                  C How to Program
+3                C++ How to Program
+4     Internet & WWW How to Program
+5     Intro to Python for CS and DS
+6               Java How to Program
+7  Visual Basic 2012 How to Program
+8          Visual C# How to Program
+9         Visual C++ How to Program
+
+pd.read_sql("""SELECT title, copyright, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY title, copyright""", connection).head()
+---------------------------------------------------------------------------
+OperationalError                          Traceback (most recent call last)
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1724         try:
+-> 1725             cur.execute(*args, **kwargs)
+   1726             return cur
+
+OperationalError: no such column: title
+
+The above exception was the direct cause of the following exception:
+
+DatabaseError                             Traceback (most recent call last)
+<ipython-input-10-92582d2b19c6> in <module>
+----> 1 pd.read_sql("""SELECT title, copyright, isbn
+      2             FROM authors
+      3             INNER JOIN author_ISBN
+      4                 ON authors.id = author_ISBN.id
+      5             ORDER BY title, copyright""", connection).head()
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_sql(sql, con, index_col, coerce_float, params, parse_dates, columns, chunksize)
+    493 
+    494     if isinstance(pandas_sql, SQLiteDatabase):
+--> 495         return pandas_sql.read_query(
+    496             sql,
+    497             index_col=index_col,
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_query(self, sql, index_col, coerce_float, params, parse_dates, chunksize)
+   1769 
+   1770         args = _convert_params(sql, params)
+-> 1771         cursor = self.execute(*args)
+   1772         columns = [col_desc[0] for col_desc in cursor.description]
+   1773 
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1735 
+   1736             ex = DatabaseError(f"Execution failed on sql '{args[0]}': {exc}")
+-> 1737             raise ex from exc
+   1738 
+   1739     @staticmethod
+
+DatabaseError: Execution failed on sql 'SELECT title, copyright, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY title, copyright': no such column: title
+
+pd.read_sql("""SELECT title, copyright, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY titles, copyright""", connection).head()
+---------------------------------------------------------------------------
+OperationalError                          Traceback (most recent call last)
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1724         try:
+-> 1725             cur.execute(*args, **kwargs)
+   1726             return cur
+
+OperationalError: no such column: title
+
+The above exception was the direct cause of the following exception:
+
+DatabaseError                             Traceback (most recent call last)
+<ipython-input-11-a87ba2b26a19> in <module>
+----> 1 pd.read_sql("""SELECT title, copyright, isbn
+      2             FROM authors
+      3             INNER JOIN author_ISBN
+      4                 ON authors.id = author_ISBN.id
+      5             ORDER BY titles, copyright""", connection).head()
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_sql(sql, con, index_col, coerce_float, params, parse_dates, columns, chunksize)
+    493 
+    494     if isinstance(pandas_sql, SQLiteDatabase):
+--> 495         return pandas_sql.read_query(
+    496             sql,
+    497             index_col=index_col,
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_query(self, sql, index_col, coerce_float, params, parse_dates, chunksize)
+   1769 
+   1770         args = _convert_params(sql, params)
+-> 1771         cursor = self.execute(*args)
+   1772         columns = [col_desc[0] for col_desc in cursor.description]
+   1773 
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1735 
+   1736             ex = DatabaseError(f"Execution failed on sql '{args[0]}': {exc}")
+-> 1737             raise ex from exc
+   1738 
+   1739     @staticmethod
+
+DatabaseError: Execution failed on sql 'SELECT title, copyright, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY titles, copyright': no such column: title
+
+pd.read_sql("""SELECT titles, copyright, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY titles, copyright""", connection).head()
+---------------------------------------------------------------------------
+OperationalError                          Traceback (most recent call last)
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1724         try:
+-> 1725             cur.execute(*args, **kwargs)
+   1726             return cur
+
+OperationalError: no such column: titles
+
+The above exception was the direct cause of the following exception:
+
+DatabaseError                             Traceback (most recent call last)
+<ipython-input-12-233934a1078c> in <module>
+----> 1 pd.read_sql("""SELECT titles, copyright, isbn
+      2             FROM authors
+      3             INNER JOIN author_ISBN
+      4                 ON authors.id = author_ISBN.id
+      5             ORDER BY titles, copyright""", connection).head()
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_sql(sql, con, index_col, coerce_float, params, parse_dates, columns, chunksize)
+    493 
+    494     if isinstance(pandas_sql, SQLiteDatabase):
+--> 495         return pandas_sql.read_query(
+    496             sql,
+    497             index_col=index_col,
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_query(self, sql, index_col, coerce_float, params, parse_dates, chunksize)
+   1769 
+   1770         args = _convert_params(sql, params)
+-> 1771         cursor = self.execute(*args)
+   1772         columns = [col_desc[0] for col_desc in cursor.description]
+   1773 
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1735 
+   1736             ex = DatabaseError(f"Execution failed on sql '{args[0]}': {exc}")
+-> 1737             raise ex from exc
+   1738 
+   1739     @staticmethod
+
+DatabaseError: Execution failed on sql 'SELECT titles, copyright, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY titles, copyright': no such column: titles
+
+pd.read_sql("""SELECT first, last, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY title, copyright""", connection).head()
+---------------------------------------------------------------------------
+OperationalError                          Traceback (most recent call last)
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1724         try:
+-> 1725             cur.execute(*args, **kwargs)
+   1726             return cur
+
+OperationalError: no such column: title
+
+The above exception was the direct cause of the following exception:
+
+DatabaseError                             Traceback (most recent call last)
+<ipython-input-13-1a4c545c0d16> in <module>
+----> 1 pd.read_sql("""SELECT first, last, isbn
+      2             FROM authors
+      3             INNER JOIN author_ISBN
+      4                 ON authors.id = author_ISBN.id
+      5             ORDER BY title, copyright""", connection).head()
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_sql(sql, con, index_col, coerce_float, params, parse_dates, columns, chunksize)
+    493 
+    494     if isinstance(pandas_sql, SQLiteDatabase):
+--> 495         return pandas_sql.read_query(
+    496             sql,
+    497             index_col=index_col,
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_query(self, sql, index_col, coerce_float, params, parse_dates, chunksize)
+   1769 
+   1770         args = _convert_params(sql, params)
+-> 1771         cursor = self.execute(*args)
+   1772         columns = [col_desc[0] for col_desc in cursor.description]
+   1773 
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1735 
+   1736             ex = DatabaseError(f"Execution failed on sql '{args[0]}': {exc}")
+-> 1737             raise ex from exc
+   1738 
+   1739     @staticmethod
+
+DatabaseError: Execution failed on sql 'SELECT first, last, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY title, copyright': no such column: title
+
+pd.read_sql("""SELECT first, last, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY last, copyright""", connection).head()
+---------------------------------------------------------------------------
+OperationalError                          Traceback (most recent call last)
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1724         try:
+-> 1725             cur.execute(*args, **kwargs)
+   1726             return cur
+
+OperationalError: no such column: copyright
+
+The above exception was the direct cause of the following exception:
+
+DatabaseError                             Traceback (most recent call last)
+<ipython-input-14-06a76d8ed2aa> in <module>
+----> 1 pd.read_sql("""SELECT first, last, isbn
+      2             FROM authors
+      3             INNER JOIN author_ISBN
+      4                 ON authors.id = author_ISBN.id
+      5             ORDER BY last, copyright""", connection).head()
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_sql(sql, con, index_col, coerce_float, params, parse_dates, columns, chunksize)
+    493 
+    494     if isinstance(pandas_sql, SQLiteDatabase):
+--> 495         return pandas_sql.read_query(
+    496             sql,
+    497             index_col=index_col,
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_query(self, sql, index_col, coerce_float, params, parse_dates, chunksize)
+   1769 
+   1770         args = _convert_params(sql, params)
+-> 1771         cursor = self.execute(*args)
+   1772         columns = [col_desc[0] for col_desc in cursor.description]
+   1773 
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1735 
+   1736             ex = DatabaseError(f"Execution failed on sql '{args[0]}': {exc}")
+-> 1737             raise ex from exc
+   1738 
+   1739     @staticmethod
+
+DatabaseError: Execution failed on sql 'SELECT first, last, isbn
+            FROM authors
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY last, copyright': no such column: copyright
+
+pd.read_sql("""SELECT title,copyright,isbn
+            FROM titles
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY last, copyright""", connection).head()
+---------------------------------------------------------------------------
+OperationalError                          Traceback (most recent call last)
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1724         try:
+-> 1725             cur.execute(*args, **kwargs)
+   1726             return cur
+
+OperationalError: ambiguous column name: isbn
+
+The above exception was the direct cause of the following exception:
+
+DatabaseError                             Traceback (most recent call last)
+<ipython-input-15-b8ad998d5ebf> in <module>
+----> 1 pd.read_sql("""SELECT title,copyright,isbn
+      2             FROM titles
+      3             INNER JOIN author_ISBN
+      4                 ON authors.id = author_ISBN.id
+      5             ORDER BY last, copyright""", connection).head()
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_sql(sql, con, index_col, coerce_float, params, parse_dates, columns, chunksize)
+    493 
+    494     if isinstance(pandas_sql, SQLiteDatabase):
+--> 495         return pandas_sql.read_query(
+    496             sql,
+    497             index_col=index_col,
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_query(self, sql, index_col, coerce_float, params, parse_dates, chunksize)
+   1769 
+   1770         args = _convert_params(sql, params)
+-> 1771         cursor = self.execute(*args)
+   1772         columns = [col_desc[0] for col_desc in cursor.description]
+   1773 
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1735 
+   1736             ex = DatabaseError(f"Execution failed on sql '{args[0]}': {exc}")
+-> 1737             raise ex from exc
+   1738 
+   1739     @staticmethod
+
+DatabaseError: Execution failed on sql 'SELECT title,copyright,isbn
+            FROM titles
+            INNER JOIN author_ISBN
+                ON authors.id = author_ISBN.id
+            ORDER BY last, copyright': ambiguous column name: isbn
+
+pd.read_sql("""SELECT title,copyright,isbn
+            FROM titles
+            INNER JOIN author_ISBN
+                ON a.id = author_ISBN.id
+            ORDER BY last, copyright""", connection).head()
+---------------------------------------------------------------------------
+OperationalError                          Traceback (most recent call last)
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1724         try:
+-> 1725             cur.execute(*args, **kwargs)
+   1726             return cur
+
+OperationalError: ambiguous column name: isbn
+
+The above exception was the direct cause of the following exception:
+
+DatabaseError                             Traceback (most recent call last)
+<ipython-input-16-9a0b80b17089> in <module>
+----> 1 pd.read_sql("""SELECT title,copyright,isbn
+      2             FROM titles
+      3             INNER JOIN author_ISBN
+      4                 ON a.id = author_ISBN.id
+      5             ORDER BY last, copyright""", connection).head()
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_sql(sql, con, index_col, coerce_float, params, parse_dates, columns, chunksize)
+    493 
+    494     if isinstance(pandas_sql, SQLiteDatabase):
+--> 495         return pandas_sql.read_query(
+    496             sql,
+    497             index_col=index_col,
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in read_query(self, sql, index_col, coerce_float, params, parse_dates, chunksize)
+   1769 
+   1770         args = _convert_params(sql, params)
+-> 1771         cursor = self.execute(*args)
+   1772         columns = [col_desc[0] for col_desc in cursor.description]
+   1773 
+
+~\anaconda3\lib\site-packages\pandas\io\sql.py in execute(self, *args, **kwargs)
+   1735 
+   1736             ex = DatabaseError(f"Execution failed on sql '{args[0]}': {exc}")
+-> 1737             raise ex from exc
+   1738 
+   1739     @staticmethod
+
+DatabaseError: Execution failed on sql 'SELECT title,copyright,isbn
+            FROM titles
+            INNER JOIN author_ISBN
+                ON a.id = author_ISBN.id
+            ORDER BY last, copyright': ambiguous column name: isbn
+
+cursor = connection.cursor()
+
+cursor = cursor.execute("""INSERT INTO authors (first, last)
+                            VALUES('Neil', 'Normando')""")
+
+pd.read_sql('SELECT id, first, last FROM authors',
+            connection, index_col=['id'])
+Out[19]: 
+        first      last
+id                     
+1        Paul    Deitel
+2      Harvey    Deitel
+3       Abbey    Deitel
+4         Dan     Quirk
+5   Alexander      Wald
+6        Neil  Normando
+
+cursor = cursor.execute("""INSERT INTO authors (title)
+                            VALUES('Weird News')""")
+---------------------------------------------------------------------------
+OperationalError                          Traceback (most recent call last)
+<ipython-input-20-3a5950a6bfd4> in <module>
+----> 1 cursor = cursor.execute("""INSERT INTO authors (title)
+      2                             VALUES('Weird News')""")
+
+OperationalError: table authors has no column named title
+
+cursor = cursor.execute("""INSERT INTO titles (title)
+                            VALUES('Weird News')""")
+---------------------------------------------------------------------------
+IntegrityError                            Traceback (most recent call last)
+<ipython-input-21-087c8c58d827> in <module>
+----> 1 cursor = cursor.execute("""INSERT INTO titles (title)
+      2                             VALUES('Weird News')""")
+
+IntegrityError: NOT NULL constraint failed: titles.isbn
+
+cursor = cursor.execute("""INSERT INTO titles(isbn,title)
+                            VALUES('0123456789', 'Weird NEws')""")
+---------------------------------------------------------------------------
+IntegrityError                            Traceback (most recent call last)
+<ipython-input-22-3cff3804095f> in <module>
+----> 1 cursor = cursor.execute("""INSERT INTO titles(isbn,title)
+      2                             VALUES('0123456789', 'Weird NEws')""")
+
+IntegrityError: NOT NULL constraint failed: titles.edition
